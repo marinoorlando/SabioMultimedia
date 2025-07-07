@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 import { History, Image as ImageIcon, FileText, PlusCircle, Search } from "lucide-react";
 
 import type { ProcessedItem } from "@/lib/types";
@@ -22,7 +23,7 @@ import { Logo } from "@/components/icons";
 interface HistorySidebarProps {
   items: ProcessedItem[];
   selectedId: string | null;
-  onSelectItem: (id: string) => void;
+  onSelectItem: (id: string | null) => void;
 }
 
 export function HistorySidebar({
@@ -50,7 +51,7 @@ export function HistorySidebar({
               "group-data-[collapsible=icon]:hidden"
             )}
           >
-            MultiMedia Sage
+            Sabio MultiMedia
           </h1>
         </div>
       </SidebarHeader>
@@ -64,7 +65,7 @@ export function HistorySidebar({
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Filter history..."
+            placeholder="Filtrar historial..."
             className="pl-8 h-9"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -72,7 +73,7 @@ export function HistorySidebar({
         </div>
         <Button variant="outline" onClick={() => onSelectItem(null)}>
           <PlusCircle className="mr-2 h-4 w-4" />
-          New Analysis
+          Nuevo Análisis
         </Button>
       </div>
 
@@ -98,7 +99,7 @@ export function HistorySidebar({
                 </div>
                 <div className="w-full pl-6">
                   <span className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(item.createdAt, { addSuffix: true })}
+                    {formatDistanceToNow(item.createdAt, { addSuffix: true, locale: es })}
                   </span>
                 </div>
               </SidebarMenuButton>
@@ -112,7 +113,7 @@ export function HistorySidebar({
               )}
             >
               <History className="mx-auto h-8 w-8 mb-2" />
-              Your history will appear here.
+              Tu historial aparecerá aquí.
             </div>
           )}
         </SidebarMenu>

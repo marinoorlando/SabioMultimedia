@@ -37,7 +37,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const formSchema = z.object({
-  text: z.string().min(10, { message: "Please enter at least 10 characters." }),
+  text: z.string().min(10, { message: "Por favor, introduce al menos 10 caracteres." }),
   length: z.enum(["short", "medium", "long"]),
   focus: z.enum(["informative", "critical", "narrative", "technical"]),
   format: z.enum(["list", "paragraph", "mixed"]),
@@ -85,8 +85,8 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
     } else {
       toast({
         variant: "destructive",
-        title: "Unsupported File Type",
-        description: `Cannot process ${file.type}. Please upload TXT, JPG, or PNG files.`,
+        title: "Tipo de archivo no compatible",
+        description: `No se puede procesar ${file.type}. Por favor, sube archivos TXT, JPG o PNG.`,
       });
     }
   };
@@ -115,10 +115,10 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
       <CardHeader>
         <CardTitle className="font-headline text-3xl text-primary flex items-center gap-2">
           <Wand2 />
-          Start a New Analysis
+          Iniciar un Nuevo Análisis
         </CardTitle>
         <CardDescription>
-          Provide content below to generate summaries or descriptions using AI.
+          Proporciona contenido a continuación para generar resúmenes o descripciones usando IA.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -126,11 +126,11 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="text">
               <FileText className="mr-2 h-4 w-4" />
-              Text Input
+              Entrada de Texto
             </TabsTrigger>
             <TabsTrigger value="upload">
               <Upload className="mr-2 h-4 w-4" />
-              File Upload
+              Subir Archivo
             </TabsTrigger>
           </TabsList>
           
@@ -142,10 +142,10 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
                   name="text"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Paste your text here</FormLabel>
+                      <FormLabel>Pega tu texto aquí</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Enter a long article, notes, or any text you want to process..."
+                          placeholder="Introduce un artículo largo, notas o cualquier texto que quieras procesar..."
                           className="min-h-[200px]"
                           {...field}
                         />
@@ -156,18 +156,18 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
                 />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <FormField control={form.control} name="length" render={({ field }) => (
-                    <FormItem><FormLabel>Length</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select length" /></SelectTrigger></FormControl><SelectContent><SelectItem value="short">Short</SelectItem><SelectItem value="medium">Medium</SelectItem><SelectItem value="long">Long</SelectItem></SelectContent></Select></FormItem>
+                    <FormItem><FormLabel>Longitud</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Selecciona longitud" /></SelectTrigger></FormControl><SelectContent><SelectItem value="short">Corta</SelectItem><SelectItem value="medium">Media</SelectItem><SelectItem value="long">Larga</SelectItem></SelectContent></Select></FormItem>
                   )}/>
                   <FormField control={form.control} name="focus" render={({ field }) => (
-                     <FormItem><FormLabel>Focus</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select focus" /></SelectTrigger></FormControl><SelectContent><SelectItem value="informative">Informative</SelectItem><SelectItem value="critical">Critical</SelectItem><SelectItem value="narrative">Narrative</SelectItem><SelectItem value="technical">Technical</SelectItem></SelectContent></Select></FormItem>
+                     <FormItem><FormLabel>Enfoque</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Selecciona enfoque" /></SelectTrigger></FormControl><SelectContent><SelectItem value="informative">Informativo</SelectItem><SelectItem value="critical">Crítico</SelectItem><SelectItem value="narrative">Narrativo</SelectItem><SelectItem value="technical">Técnico</SelectItem></SelectContent></Select></FormItem>
                   )}/>
                    <FormField control={form.control} name="format" render={({ field }) => (
-                     <FormItem><FormLabel>Format</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select format" /></SelectTrigger></FormControl><SelectContent><SelectItem value="list">List</SelectItem><SelectItem value="paragraph">Paragraph</SelectItem><SelectItem value="mixed">Mixed</SelectItem></SelectContent></Select></FormItem>
+                     <FormItem><FormLabel>Formato</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Selecciona formato" /></SelectTrigger></FormControl><SelectContent><SelectItem value="list">Lista</SelectItem><SelectItem value="paragraph">Párrafo</SelectItem><SelectItem value="mixed">Mixto</SelectItem></SelectContent></Select></FormItem>
                   )}/>
                 </div>
                 <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                  Generate Summary
+                  Generar Resumen
                 </Button>
               </form>
             </Form>
@@ -191,9 +191,9 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                         <Upload className="w-10 h-10 mb-3 text-muted-foreground" />
                         <p className="mb-2 text-sm text-muted-foreground">
-                            <span className="font-semibold text-primary">Click to upload</span> or drag and drop
+                            <span className="font-semibold text-primary">Haz clic para subir</span> o arrastra y suelta
                         </p>
-                        <p className="text-xs text-muted-foreground">TXT, PNG, JPG files</p>
+                        <p className="text-xs text-muted-foreground">Archivos TXT, PNG, JPG</p>
                     </div>
                     <input id="dropzone-file" type="file" className="hidden" accept=".txt,.png,.jpg,.jpeg" onChange={(e) => handleFileChange(e.target.files)} />
                 </label>

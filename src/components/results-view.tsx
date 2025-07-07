@@ -48,7 +48,7 @@ export function ResultsView({ item, onUpdate }: ResultsViewProps) {
   
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: "Copied!", description: `${type} copied to clipboard.` });
+    toast({ title: "¡Copiado!", description: `${type} copiado al portapapeles.` });
   };
 
   const downloadFile = (filename: string, text: string) => {
@@ -63,13 +63,13 @@ export function ResultsView({ item, onUpdate }: ResultsViewProps) {
   
   const createMarkdown = () => {
     let md = `# ${item.title}\n\n`;
-    md += `**Tags:** ${item.tags.map(t => `\`${t}\``).join(', ')}\n\n`;
+    md += `**Etiquetas:** ${item.tags.map(t => `\`${t}\``).join(', ')}\n\n`;
     if(item.type === 'text') {
-      md += `## Summary\n\n${item.summary}\n\n---\n\n`;
-      md += `## Original Text\n\n> ${item.originalContent.replace(/\n/g, '\n> ')}`;
+      md += `## Resumen\n\n${item.summary}\n\n---\n\n`;
+      md += `## Texto Original\n\n> ${item.originalContent.replace(/\n/g, '\n> ')}`;
     } else {
-      md += `## Description\n\n${item.description}\n\n`;
-      md += `![Image](${item.imageUrl})\n`;
+      md += `## Descripción\n\n${item.description}\n\n`;
+      md += `![Imagen](${item.imageUrl})\n`;
     }
     return md;
   }
@@ -82,11 +82,11 @@ export function ResultsView({ item, onUpdate }: ResultsViewProps) {
             <div>
               <CardTitle className="font-headline text-3xl text-primary">{item.title}</CardTitle>
               <CardDescription>
-                Analyzed on {new Date(item.createdAt).toLocaleString()}
+                Analizado el {new Date(item.createdAt).toLocaleString('es-ES')}
               </CardDescription>
             </div>
             <ExportMenu
-              onCopy={() => copyToClipboard(item.type === 'text' ? item.summary : item.description, 'Result')}
+              onCopy={() => copyToClipboard(item.type === 'text' ? item.summary : item.description, 'Resultado')}
               onDownloadTxt={() => downloadFile(`${item.id}.txt`, item.type === 'text' ? item.summary : item.description)}
               onDownloadMd={() => downloadFile(`${item.id}.md`, createMarkdown())}
             />
@@ -115,7 +115,7 @@ function TextView({ item, onUpdate }: { item: ProcessedText, onUpdate: (item: Pr
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <h3 className="font-headline text-xl font-semibold mb-2">Original Text</h3>
+        <h3 className="font-headline text-xl font-semibold mb-2">Texto Original</h3>
         <Card className="bg-muted/30 max-h-96 overflow-y-auto">
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground whitespace-pre-wrap">
@@ -126,7 +126,7 @@ function TextView({ item, onUpdate }: { item: ProcessedText, onUpdate: (item: Pr
       </div>
       <div>
         <div className="flex justify-between items-center mb-2">
-            <h3 className="font-headline text-xl font-semibold">AI Summary</h3>
+            <h3 className="font-headline text-xl font-semibold">Resumen de IA</h3>
             <RefineDialog item={item} onUpdate={onUpdate} />
         </div>
         <Card className="bg-background">
@@ -143,7 +143,7 @@ function ImageView({ item, onUpdate }: { item: ProcessedImage, onUpdate: (item: 
   return (
      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <h3 className="font-headline text-xl font-semibold mb-2">Original Image</h3>
+        <h3 className="font-headline text-xl font-semibold mb-2">Imagen Original</h3>
         <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
           <Image
             src={item.imageUrl}
@@ -156,7 +156,7 @@ function ImageView({ item, onUpdate }: { item: ProcessedImage, onUpdate: (item: 
       </div>
       <div>
         <div className="flex justify-between items-center mb-2">
-            <h3 className="font-headline text-xl font-semibold">AI Description</h3>
+            <h3 className="font-headline text-xl font-semibold">Descripción de IA</h3>
             <RefineDialog item={item} onUpdate={onUpdate} />
         </div>
         <Card className="bg-background">
@@ -174,18 +174,18 @@ function ExportMenu({ onCopy, onDownloadTxt, onDownloadMd }: { onCopy: () => voi
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                    <Download className="mr-2 h-4 w-4" /> Export
+                    <Download className="mr-2 h-4 w-4" /> Exportar
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={onCopy}>
-                    <Copy className="mr-2 h-4 w-4" /> Copy Result
+                    <Copy className="mr-2 h-4 w-4" /> Copiar Resultado
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={onDownloadTxt}>
-                    <Download className="mr-2 h-4 w-4" /> Download .txt
+                    <Download className="mr-2 h-4 w-4" /> Descargar .txt
                 </DropdownMenuItem>
                  <DropdownMenuItem onClick={onDownloadMd}>
-                    <Download className="mr-2 h-4 w-4" /> Download .md
+                    <Download className="mr-2 h-4 w-4" /> Descargar .md
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
@@ -207,7 +207,7 @@ function RefineDialog({ item, onUpdate }: { item: ProcessedItem, onUpdate: (item
       const result = await refineSummary({
         originalText,
         initialSummary,
-        userFeedback: "User wants to improve this.",
+        userFeedback: "El usuario quiere mejorar esto.",
         refinementInstructions: instructions,
       });
 
@@ -218,11 +218,11 @@ function RefineDialog({ item, onUpdate }: { item: ProcessedItem, onUpdate: (item
         updatedItem.description = result.refinedSummary;
       }
       onUpdate(updatedItem);
-      toast({ title: "Successfully refined!" });
+      toast({ title: "¡Refinado con éxito!" });
       setIsOpen(false);
     } catch (error) {
       console.error("Refinement failed:", error);
-      toast({ variant: "destructive", title: "Refinement failed", description: "Please try again." });
+      toast({ variant: "destructive", title: "Falló el refinamiento", description: "Por favor, inténtalo de nuevo." });
     } finally {
       setIsLoading(false);
     }
@@ -232,24 +232,24 @@ function RefineDialog({ item, onUpdate }: { item: ProcessedItem, onUpdate: (item
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm">
-          <Edit className="mr-2 h-4 w-4" /> Refine
+          <Edit className="mr-2 h-4 w-4" /> Refinar
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Wand2/>Refine AI Generation</DialogTitle>
+          <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Wand2/>Refinar Generación de IA</DialogTitle>
           <DialogDescription>
-            Provide instructions on how to improve the summary or description.
+            Proporciona instrucciones sobre cómo mejorar el resumen o la descripción.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="instructions">Refinement Instructions</Label>
+            <Label htmlFor="instructions">Instrucciones de Refinamiento</Label>
             <Textarea 
               id="instructions"
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
-              placeholder="e.g., 'Make it more formal', 'Focus on the financial aspects', 'Add more details about the main character'."
+              placeholder="Ej: 'Hazlo más formal', 'Céntrate en los aspectos financieros', 'Añade más detalles sobre el personaje principal'."
               className="min-h-[100px]"
             />
           </div>
@@ -257,7 +257,7 @@ function RefineDialog({ item, onUpdate }: { item: ProcessedItem, onUpdate: (item
         <DialogFooter>
           <Button type="button" onClick={handleRefine} disabled={isLoading}>
             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            Refine and Save
+            Refinar y Guardar
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -65,7 +65,7 @@ export default function Home() {
           type: "text",
           title: generateTitle(content),
           createdAt: new Date(),
-          tags: ["text", "summary"],
+          tags: ["texto", "resumen"],
           originalContent: content,
           summary: result.summary,
           config: config ?? { length: 'medium', focus: 'informative', format: 'paragraph' }
@@ -75,9 +75,9 @@ export default function Home() {
         newItem = {
           id,
           type: "image",
-          title: "New Image Analysis",
+          title: "Nuevo Análisis de Imagen",
           createdAt: new Date(),
-          tags: ["image", "vision"],
+          tags: ["imagen", "visión"],
           imageUrl: content,
           description: result.description,
         };
@@ -86,15 +86,15 @@ export default function Home() {
       setItems((prev) => [newItem, ...prev]);
       setSelectedId(newItem.id);
       toast({
-        title: "Success!",
-        description: `${type === 'text' ? 'Summary' : 'Description'} generated successfully.`,
+        title: "¡Éxito!",
+        description: `${type === 'text' ? 'Resumen' : 'Descripción'} generado correctamente.`,
       });
     } catch (error) {
       console.error("Error processing item:", error);
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with the AI request.",
+        title: "¡Uy! Algo salió mal.",
+        description: "Hubo un problema con la solicitud de IA.",
       });
     } finally {
       setIsLoading(false);
