@@ -33,6 +33,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
@@ -294,7 +295,7 @@ function GeneratePromptDialog({ item }: { item: ProcessedImage }) {
         description: item.description,
       });
       setGeneratedPrompt(result.imagePrompt);
-      toast({ title: "¡Prompt de imagen generado con éxito!" });
+      toast({ title: "¡Prompt de imagen generado!" });
     } catch (error) {
       console.error("Image prompt generation failed:", error);
       toast({ variant: "destructive", title: "Falló la generación del prompt", description: "Por favor, inténtalo de nuevo." });
