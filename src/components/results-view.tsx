@@ -33,7 +33,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
@@ -295,10 +294,10 @@ function GeneratePromptDialog({ item }: { item: ProcessedImage }) {
         description: item.description,
       });
       setGeneratedPrompt(result.imagePrompt);
-      toast({ title: "Image prompt generated successfully!" });
+      toast({ title: "¡Prompt de imagen generado con éxito!" });
     } catch (error) {
       console.error("Image prompt generation failed:", error);
-      toast({ variant: "destructive", title: "Prompt generation failed", description: "Please try again." });
+      toast({ variant: "destructive", title: "Falló la generación del prompt", description: "Por favor, inténtalo de nuevo." });
     } finally {
       setIsLoading(false);
     }
@@ -306,7 +305,7 @@ function GeneratePromptDialog({ item }: { item: ProcessedImage }) {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: "Copied!", description: "Prompt copied to clipboard." });
+    toast({ title: "¡Copiado!", description: "Prompt copiado al portapapeles." });
   };
   
   React.useEffect(() => {
@@ -324,9 +323,9 @@ function GeneratePromptDialog({ item }: { item: ProcessedImage }) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Wand2/>Generate Image Prompt</DialogTitle>
+          <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Wand2/>Generar Prompt de Imagen</DialogTitle>
           <DialogDescription>
-            Use the AI description to generate a detailed prompt for an image generator. The result will be in English.
+            Usa la descripción de la IA para generar un prompt detallado para un generador de imágenes. El resultado estará en inglés.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4 min-h-[200px]">
@@ -336,36 +335,34 @@ function GeneratePromptDialog({ item }: { item: ProcessedImage }) {
                 </div>
             ) : generatedPrompt ? (
               <div className="space-y-2">
-                <Label htmlFor="generated-prompt">Generated Prompt</Label>
-                <div className="relative">
-                    <Textarea 
-                      id="generated-prompt"
-                      readOnly
-                      value={generatedPrompt}
-                      className="min-h-[120px] pr-10 bg-muted/50"
-                    />
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="absolute top-2 right-2 h-7 w-7"
-                        onClick={() => copyToClipboard(generatedPrompt)}
-                    >
-                        <Copy className="h-4 w-4" />
-                        <span className="sr-only">Copy Prompt</span>
-                    </Button>
-                </div>
+                <Label htmlFor="generated-prompt">Prompt Generado</Label>
+                <Textarea 
+                  id="generated-prompt"
+                  readOnly
+                  value={generatedPrompt}
+                  className="min-h-[120px] bg-muted/50"
+                />
               </div>
             ) : (
                  <div className="text-sm text-muted-foreground p-4 border rounded-md bg-muted/50">
-                    <span className="font-semibold text-foreground">Original Description:</span><br />
+                    <span className="font-semibold text-foreground">Descripción Original:</span><br />
                     {item.description}
                 </div>
             )}
         </div>
         <DialogFooter>
+          {generatedPrompt && (
+              <Button 
+                  variant="outline"
+                  onClick={() => copyToClipboard(generatedPrompt)}
+              >
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copiar
+              </Button>
+          )}
           <Button type="button" onClick={handleGenerate} disabled={isLoading}>
             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-            {generatedPrompt ? "Regenerate" : "Generate Prompt"}
+            {generatedPrompt ? "Regenerar" : "Generar Prompt"}
           </Button>
         </DialogFooter>
       </DialogContent>
