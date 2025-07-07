@@ -168,7 +168,10 @@ function ImageView({ item, onUpdate }: { item: ProcessedImage, onUpdate: (item: 
       <div>
         <div className="flex justify-between items-center mb-2">
             <h3 className="font-headline text-xl font-semibold">Descripción de IA</h3>
-            <RefineDialog item={item} onUpdate={onUpdate} />
+            <div className="flex items-center gap-1">
+              <RefineDialog item={item} onUpdate={onUpdate} />
+              <GeneratePromptDialog item={item} />
+            </div>
         </div>
         <Card className="bg-background">
             <CardContent className="p-4">
@@ -269,6 +272,100 @@ function RefineDialog({ item, onUpdate }: { item: ProcessedItem, onUpdate: (item
           <Button type="button" onClick={handleRefine} disabled={isLoading}>
             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Refinar y Guardar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+
+function GeneratePromptDialog({ item }: { item: ProcessedImage }) {
+  const { toast } = useToast();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [generatedPrompt, setGeneratedPrompt] = React.useState("");
+
+  const handleGenerate = async () => {
+    setIsLoading(true);
+    setGeneratedPrompt("");
+    try {
+      const { generateImagePrompt } = await import("@/ai/flows/generate-image-prompt");
+      const result = await generateImagePrompt({
+        description: item.description,
+      });
+      setGeneratedPrompt(result.imagePrompt);
+      toast({ title: "Image prompt generated successfully!" });
+    } catch (error) {
+      console.error("Image prompt generation failed:", error);
+      toast({ variant: "destructive", title: "Prompt generation failed", description: "Please try again." });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "Copied!", description: "Prompt copied to clipboard." });
+  };
+  
+  React.useEffect(() => {
+    if (!isOpen) {
+      setGeneratedPrompt("");
+    }
+  }, [isOpen]);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm">
+          <Wand2 className="mr-2 h-4 w-4" /> Prompt
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Wand2/>Generate Image Prompt</DialogTitle>
+          <DialogDescription>
+            Use the AI description to generate a detailed prompt for an image generator. The result will be in English.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4 min-h-[200px]">
+            {isLoading ? (
+                <div className="flex items-center justify-center p-4">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+            ) : generatedPrompt ? (
+              <div className="space-y-2">
+                <Label htmlFor="generated-prompt">Generated Prompt</Label>
+                <div className="relative">
+                    <Textarea 
+                      id="generated-prompt"
+                      readOnly
+                      value={generatedPrompt}
+                      className="min-h-[120px] pr-10 bg-muted/50"
+                    />
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute top-2 right-2 h-7 w-7"
+                        onClick={() => copyToClipboard(generatedPrompt)}
+                    >
+                        <Copy className="h-4 w-4" />
+                        <span className="sr-only">Copy Prompt</span>
+                    </Button>
+                </div>
+              </div>
+            ) : (
+                 <div className="text-sm text-muted-foreground p-4 border rounded-md bg-muted/50">
+                    <span className="font-semibold text-foreground">Original Description:</span><br />
+                    {item.description}
+                </div>
+            )}
+        </div>
+        <DialogFooter>
+          <Button type="button" onClick={handleGenerate} disabled={isLoading}>
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+            {generatedPrompt ? "Regenerate" : "Generate Prompt"}
           </Button>
         </DialogFooter>
       </DialogContent>
