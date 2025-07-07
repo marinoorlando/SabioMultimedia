@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { History, PlusCircle } from "lucide-react";
+import { History } from "lucide-react";
 
 import type { ProcessedItem, SummarizeConfig } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -44,7 +44,8 @@ export default function Home() {
   const handleProcessNewItem = async (
     type: "text" | "image",
     content: string,
-    config?: SummarizeConfig
+    config?: SummarizeConfig,
+    filename?: string
   ) => {
     setIsLoading(true);
     setSelectedId(null); // Deselect any previous item
@@ -63,23 +64,25 @@ export default function Home() {
         newItem = {
           id,
           type: "text",
-          title: generateTitle(content),
+          title: filename || generateTitle(content),
           createdAt: new Date(),
           tags: ["texto", "resumen"],
           originalContent: content,
           summary: result.summary,
-          config: config ?? { length: 'medium', focus: 'informative', format: 'paragraph' }
+          config: config ?? { length: 'medium', focus: 'informative', format: 'paragraph' },
+          originalFilename: filename,
         };
       } else {
         const result = await describeImage({ photoDataUri: content });
         newItem = {
           id,
           type: "image",
-          title: "Nuevo Análisis de Imagen",
+          title: filename || "Nuevo Análisis de Imagen",
           createdAt: new Date(),
           tags: ["imagen", "visión"],
           imageUrl: content,
           description: result.description,
+          originalFilename: filename,
         };
       }
 

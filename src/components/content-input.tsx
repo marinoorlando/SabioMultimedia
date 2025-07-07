@@ -44,7 +44,7 @@ const formSchema = z.object({
 });
 
 interface ContentInputProps {
-  onProcess: (type: "text" | "image", content: string, config?: SummarizeConfig) => void;
+  onProcess: (type: "text" | "image", content: string, config?: SummarizeConfig, filename?: string) => void;
   isLoading: boolean;
 }
 
@@ -75,16 +75,17 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
     if (!files || files.length === 0) return;
     const file = files[0];
     const reader = new FileReader();
-    const fileName = file.name.toLowerCase();
+    const fileName = file.name;
+    const lowerCaseFileName = fileName.toLowerCase();
     const fileType = file.type;
 
     if (fileType.startsWith("image/")) {
-      reader.onload = (e) => onProcess("image", e.target?.result as string);
+      reader.onload = (e) => onProcess("image", e.target?.result as string, undefined, fileName);
       reader.readAsDataURL(file);
     } else if (fileType === "text/plain") {
-      reader.onload = (e) => onProcess("text", e.target?.result as string);
+      reader.onload = (e) => onProcess("text", e.target?.result as string, undefined, fileName);
       reader.readAsText(file);
-    } else if (fileName.endsWith(".docx")) {
+    } else if (lowerCaseFileName.endsWith(".docx")) {
       reader.onload = async (e) => {
         try {
           const mammoth = await import("mammoth");
@@ -93,7 +94,7 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
             throw new Error("Failed to read file as ArrayBuffer.");
           }
           const result = await mammoth.extractRawText({ arrayBuffer });
-          onProcess("text", result.value);
+          onProcess("text", result.value, undefined, fileName);
         } catch (error) {
           console.error("Error processing .docx file:", error);
           toast({
@@ -125,7 +126,7 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
               .join(" ");
             fullText += pageText + "\n";
           }
-          onProcess("text", fullText.trim());
+          onProcess("text", fullText.trim(), undefined, fileName);
         } catch (error) {
           console.error("Error processing .pdf file:", error);
           toast({
@@ -136,7 +137,7 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
         }
       };
       reader.readAsArrayBuffer(file);
-    } else if (fileName.endsWith(".doc")) {
+    } else if (lowerCaseFileName.endsWith(".doc")) {
       toast({
         variant: "destructive",
         title: "Tipo de archivo no compatible",
@@ -255,7 +256,7 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
                         </p>
                         <p className="text-xs text-muted-foreground">Archivos TXT, PNG, JPG, PDF, DOCX</p>
                     </div>
-                    <input id="dropzone-file" type="file" className="hidden" accept=".txt,.png,.jpg,.jpeg,.pdf,.docx,.doc" onChange={(e) => handleFileChange(e.target.files)} />
+                    <input id="dropzone-file" type="file" className="hidden" accept=".txt,.png,.jpg,.jpeg,.pdf,.docx" onChange={(e) => handleFileChange(e.target.files)} />
                 </label>
             </div>
           </TabsContent>

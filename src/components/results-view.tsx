@@ -73,6 +73,17 @@ export function ResultsView({ item, onUpdate }: ResultsViewProps) {
     }
     return md;
   }
+  
+  const getDownloadFilename = (extension: 'txt' | 'md') => {
+    const baseFilename = item.originalFilename 
+      ? item.originalFilename.substring(0, item.originalFilename.lastIndexOf('.')) || item.originalFilename
+      : item.id;
+    
+    const suffix = item.type === 'text' ? 'resumen' : 'descripcion';
+
+    return `${baseFilename}-${suffix}.${extension}`;
+  }
+
 
   return (
     <div className="space-y-8">
@@ -87,8 +98,8 @@ export function ResultsView({ item, onUpdate }: ResultsViewProps) {
             </div>
             <ExportMenu
               onCopy={() => copyToClipboard(item.type === 'text' ? item.summary : item.description, 'Resultado')}
-              onDownloadTxt={() => downloadFile(`${item.id}.txt`, item.type === 'text' ? item.summary : item.description)}
-              onDownloadMd={() => downloadFile(`${item.id}.md`, createMarkdown())}
+              onDownloadTxt={() => downloadFile(getDownloadFilename('txt'), item.type === 'text' ? item.summary : item.description)}
+              onDownloadMd={() => downloadFile(getDownloadFilename('md'), createMarkdown())}
             />
           </div>
           <div className="flex flex-wrap gap-2 pt-2">

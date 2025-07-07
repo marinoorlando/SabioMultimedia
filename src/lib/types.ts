@@ -10,6 +10,7 @@ export type ProcessedItemBase = {
   type: "text" | "image";
   title: string;
   tags: string[];
+  originalFilename?: string;
 };
 
 export type ProcessedText = ProcessedItemBase & {
