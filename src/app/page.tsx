@@ -2,13 +2,14 @@
 
 import * as React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { History } from "lucide-react";
+import { useLiveQuery } from "dexie-react-hooks";
 
 import type { ProcessedItem, SummarizeConfig } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { summarizeText } from "@/ai/flows/summarize-text";
 import { describeImage } from "@/ai/flows/describe-image";
+import { db } from "@/lib/db";
 
 import {
   Sidebar,
@@ -28,16 +29,12 @@ const generateTitle = (content: string) => {
 
 export default function Home() {
   const { toast } = useToast();
-  const [items, setItems] = React.useState<ProcessedItem[]>([]);
+  const items = useLiveQuery(() => db.items.orderBy("createdAt").reverse().toArray());
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
-  
-  const [isMounted, setIsMounted] = React.useState(false);
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const selectedItem = React.useMemo(() => {
+    if (!items) return null;
     return items.find((item) => item.id === selectedId) ?? null;
   }, [items, selectedId]);
 
@@ -85,8 +82,8 @@ export default function Home() {
           originalFilename: filename,
         };
       }
-
-      setItems((prev) => [newItem, ...prev]);
+      
+      await db.items.add(newItem);
       setSelectedId(newItem.id);
       toast({
         title: "¡Éxito!",
@@ -104,15 +101,15 @@ export default function Home() {
     }
   };
   
-  const handleUpdateItem = (updatedItem: ProcessedItem) => {
-    setItems(items.map(item => item.id === updatedItem.id ? updatedItem : item));
+  const handleUpdateItem = async (updatedItem: ProcessedItem) => {
+    await db.items.update(updatedItem.id, updatedItem);
   };
 
   const handleSelectItem = (id: string | null) => {
     setSelectedId(id);
   };
   
-  if (!isMounted) {
+  if (!items) {
     return (
        <div className="flex h-screen w-full items-center justify-center bg-background">
           <div className="flex flex-col items-center gap-4">
