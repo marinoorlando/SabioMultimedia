@@ -17,6 +17,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuAction,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,27 @@ export function HistorySidebar({
 }: HistorySidebarProps) {
   const { state } = useSidebar();
   const [filter, setFilter] = React.useState("");
+  const { toast } = useToast();
+
+  const handleDelete = async (idToDelete: string) => {
+    try {
+      if (selectedId === idToDelete) {
+        onSelectItem(null);
+      }
+      await db.items.delete(idToDelete);
+      toast({
+        title: "Elemento eliminado",
+        description: "El análisis ha sido eliminado de tu historial.",
+      });
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo eliminar el elemento.",
+      });
+    }
+  };
 
   const filteredItems = items.filter(
     (item) =>
@@ -130,6 +152,31 @@ export function HistorySidebar({
                   </span>
                 </div>
               </SidebarMenuButton>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <SidebarMenuAction showOnHover>
+                      <Trash2 />
+                      <span className="sr-only">Eliminar elemento</span>
+                  </SidebarMenuAction>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta acción no se puede deshacer. Esto eliminará permanentemente el análisis titulado "{item.title}".
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => handleDelete(item.id)}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Sí, eliminar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </SidebarMenuItem>
           ))}
           {items.length === 0 && (
@@ -262,14 +309,17 @@ function SettingsDialog() {
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
+                <AlertDialogTitle>¿Estás absolutely seguro?</AlertDialogTitle>
                 <AlertDialogDescription>
                   Esta acción no se puede deshacer. Esto eliminará permanentemente todo tu historial.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteAll}>
+                <AlertDialogAction
+                  onClick={handleDeleteAll}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
                   Sí, eliminar todo
                 </AlertDialogAction>
               </AlertDialogFooter>
