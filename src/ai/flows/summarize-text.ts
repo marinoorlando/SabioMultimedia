@@ -42,15 +42,15 @@ const prompt = ai.definePrompt({
   name: 'summarizeTextPrompt',
   input: {schema: SummarizeTextInputSchema},
   output: {schema: SummarizeTextOutputSchema},
-  prompt: `You are an expert summarizer, able to create summaries of varying lengths and focuses.
+  prompt: `Eres un experto resumidor, capaz de crear resúmenes de diversas longitudes y enfoques.
 
-  Summarize the following text in the specified length, focus, and format.
+  Resume el siguiente texto en español, con la longitud, el enfoque y el formato especificados.
 
-  Text: {{{text}}}
+  Texto: {{{text}}}
 
-  Length: {{{length}}}
-  Focus: {{{focus}}}
-  Format: {{{format}}}
+  Longitud: {{{length}}}
+  Enfoque: {{{focus}}}
+  Formato: {{{format}}}
   `,
 });
 
@@ -65,4 +65,3 @@ const summarizeTextFlow = ai.defineFlow(
     return output!;
   }
 );
-

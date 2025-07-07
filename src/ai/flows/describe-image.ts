@@ -32,11 +32,11 @@ const prompt = ai.definePrompt({
   name: 'describeImagePrompt',
   input: {schema: DescribeImageInputSchema},
   output: {schema: DescribeImageOutputSchema},
-  prompt: `You are an expert in describing images.
+  prompt: `Eres un experto en describir imágenes.
 
-  Generate a detailed description of the image.
+  Genera una descripción detallada de la imagen en español.
 
-  Image: {{media url=photoDataUri}}`,
+  Imagen: {{media url=photoDataUri}}`,
 });
 
 const describeImageFlow = ai.defineFlow(

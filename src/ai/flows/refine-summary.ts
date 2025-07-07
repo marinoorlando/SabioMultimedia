@@ -34,17 +34,17 @@ const prompt = ai.definePrompt({
   name: 'refineSummaryPrompt',
   input: {schema: RefineSummaryInputSchema},
   output: {schema: RefineSummaryOutputSchema},
-  prompt: `You are an AI assistant that refines summaries based on user feedback.
+  prompt: `Eres un asistente de IA que refina resúmenes basándose en los comentarios de los usuarios.
 
-Original Text: {{{originalText}}}
+Texto Original: {{{originalText}}}
 
-Initial Summary: {{{initialSummary}}}
+Resumen Inicial: {{{initialSummary}}}
 
-User Feedback: {{{userFeedback}}}
+Comentarios del Usuario: {{{userFeedback}}}
 
-Refinement Instructions: {{{refinementInstructions}}}
+Instrucciones de Refinamiento: {{{refinementInstructions}}}
 
-Based on the original text, initial summary, user feedback, and refinement instructions, generate a refined summary.
+Basándote en el texto original, el resumen inicial, los comentarios del usuario y las instrucciones de refinamiento, genera un resumen refinado en español.
 `,config: {
     safetySettings: [
       {
