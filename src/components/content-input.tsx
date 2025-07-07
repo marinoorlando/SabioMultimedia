@@ -5,8 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Upload, FileText, Wand2, Loader2 } from "lucide-react";
-import * as mammoth from "mammoth";
-import * as pdfjsLib from "pdfjs-dist";
 
 import { cn } from "@/lib/utils";
 import type { SummarizeConfig } from "@/lib/types";
@@ -53,10 +51,6 @@ interface ContentInputProps {
 export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
   const { toast } = useToast();
   const [dragActive, setDragActive] = React.useState(false);
-  
-  React.useEffect(() => {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -93,6 +87,7 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
     } else if (fileName.endsWith(".docx")) {
       reader.onload = async (e) => {
         try {
+          const mammoth = await import("mammoth");
           const arrayBuffer = e.target?.result;
           if (!(arrayBuffer instanceof ArrayBuffer)) {
             throw new Error("Failed to read file as ArrayBuffer.");
@@ -112,6 +107,10 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
     } else if (fileType === "application/pdf") {
       reader.onload = async (e) => {
         try {
+          const pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");
+          // Use a CDN for the worker to avoid bundling issues
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@4.5.136/build/pdf.worker.mjs`;
+          
           const arrayBuffer = e.target?.result;
           if (!(arrayBuffer instanceof ArrayBuffer)) {
             throw new Error("Failed to read file as ArrayBuffer.");
