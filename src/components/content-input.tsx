@@ -108,9 +108,9 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
     } else if (fileType === "application/pdf") {
       reader.onload = async (e) => {
         try {
-          const pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");
-          // Use a CDN for the worker to avoid bundling issues
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@4.5.136/build/pdf.worker.mjs`;
+          const pdfjsLib = await import("pdfjs-dist");
+          // Use a CDN for the worker to avoid bundling issues, and ensure versions match.
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.mjs`;
           
           const arrayBuffer = e.target?.result;
           if (!(arrayBuffer instanceof ArrayBuffer)) {
