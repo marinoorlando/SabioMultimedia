@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Upload, FileText, Wand2, Loader2 } from "lucide-react";
+import * as mammoth from "mammoth";
+import * as pdfjsLib from "pdfjs-dist";
 
 import { cn } from "@/lib/utils";
 import type { SummarizeConfig } from "@/lib/types";
@@ -52,6 +54,10 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
   const { toast } = useToast();
   const [dragActive, setDragActive] = React.useState(false);
   
+  React.useEffect(() => {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -75,18 +81,73 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
     if (!files || files.length === 0) return;
     const file = files[0];
     const reader = new FileReader();
+    const fileName = file.name.toLowerCase();
+    const fileType = file.type;
 
-    if (file.type.startsWith("image/")) {
+    if (fileType.startsWith("image/")) {
       reader.onload = (e) => onProcess("image", e.target?.result as string);
       reader.readAsDataURL(file);
-    } else if (file.type === "text/plain") {
+    } else if (fileType === "text/plain") {
       reader.onload = (e) => onProcess("text", e.target?.result as string);
       reader.readAsText(file);
+    } else if (fileName.endsWith(".docx")) {
+      reader.onload = async (e) => {
+        try {
+          const arrayBuffer = e.target?.result;
+          if (!(arrayBuffer instanceof ArrayBuffer)) {
+            throw new Error("Failed to read file as ArrayBuffer.");
+          }
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          onProcess("text", result.value);
+        } catch (error) {
+          console.error("Error processing .docx file:", error);
+          toast({
+            variant: "destructive",
+            title: "Error al procesar el archivo",
+            description: "No se pudo extraer el texto del archivo .docx.",
+          });
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else if (fileType === "application/pdf") {
+      reader.onload = async (e) => {
+        try {
+          const arrayBuffer = e.target?.result;
+          if (!(arrayBuffer instanceof ArrayBuffer)) {
+            throw new Error("Failed to read file as ArrayBuffer.");
+          }
+          const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
+          let fullText = "";
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items
+              .map(item => ('str' in item ? item.str : ''))
+              .join(" ");
+            fullText += pageText + "\n";
+          }
+          onProcess("text", fullText.trim());
+        } catch (error) {
+          console.error("Error processing .pdf file:", error);
+          toast({
+            variant: "destructive",
+            title: "Error al procesar el archivo",
+            description: "No se pudo extraer el texto del archivo PDF.",
+          });
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else if (fileName.endsWith(".doc")) {
+      toast({
+        variant: "destructive",
+        title: "Tipo de archivo no compatible",
+        description: "Los archivos .doc no son compatibles. Por favor, conviértelo a .docx.",
+      });
     } else {
       toast({
         variant: "destructive",
         title: "Tipo de archivo no compatible",
-        description: `No se puede procesar ${file.type}. Por favor, sube archivos TXT, JPG o PNG.`,
+        description: `No se puede procesar '${file.name}'. Por favor, sube archivos TXT, JPG, PNG, PDF o DOCX.`,
       });
     }
   };
@@ -193,9 +254,9 @@ export function ContentInput({ onProcess, isLoading }: ContentInputProps) {
                         <p className="mb-2 text-sm text-muted-foreground">
                             <span className="font-semibold text-primary">Haz clic para subir</span> o arrastra y suelta
                         </p>
-                        <p className="text-xs text-muted-foreground">Archivos TXT, PNG, JPG</p>
+                        <p className="text-xs text-muted-foreground">Archivos TXT, PNG, JPG, PDF, DOCX</p>
                     </div>
-                    <input id="dropzone-file" type="file" className="hidden" accept=".txt,.png,.jpg,.jpeg" onChange={(e) => handleFileChange(e.target.files)} />
+                    <input id="dropzone-file" type="file" className="hidden" accept=".txt,.png,.jpg,.jpeg,.pdf,.docx,.doc" onChange={(e) => handleFileChange(e.target.files)} />
                 </label>
             </div>
           </TabsContent>
