@@ -58,6 +58,7 @@ export function HistorySidebar({
 }: HistorySidebarProps) {
   const { state } = useSidebar();
   const [filter, setFilter] = React.useState("");
+  const [typeFilter, setTypeFilter] = React.useState<'all' | 'text' | 'image'>('all');
   const { toast } = useToast();
 
   const handleDelete = async (idToDelete: string) => {
@@ -80,11 +81,16 @@ export function HistorySidebar({
     }
   };
 
-  const filteredItems = items.filter(
-    (item) =>
-      item.title.toLowerCase().includes(filter.toLowerCase()) ||
-      item.tags.some((tag) => tag.toLowerCase().includes(filter.toLowerCase()))
-  );
+  const filteredItems = items
+    .filter((item) => {
+      if (typeFilter === "all") return true;
+      return item.type === typeFilter;
+    })
+    .filter(
+      (item) =>
+        item.title.toLowerCase().includes(filter.toLowerCase()) ||
+        item.tags.some((tag) => tag.toLowerCase().includes(filter.toLowerCase()))
+    );
 
   return (
     <Sidebar side="left" collapsible="icon">
@@ -116,6 +122,34 @@ export function HistorySidebar({
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
+        </div>
+        <div className="flex gap-1 p-1 bg-muted rounded-md">
+            <Button
+                variant={typeFilter === 'all' ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setTypeFilter('all')}
+                className="flex-1 h-7"
+            >
+                Todos
+            </Button>
+            <Button
+                variant={typeFilter === 'text' ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setTypeFilter('text')}
+                className="flex-1 h-7"
+            >
+                <FileText className="mr-1.5 h-4 w-4" />
+                Documentos
+            </Button>
+            <Button
+                variant={typeFilter === 'image' ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setTypeFilter('image')}
+                className="flex-1 h-7"
+            >
+                <ImageIcon className="mr-1.5 h-4 w-4" />
+                Imágenes
+            </Button>
         </div>
         <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => onSelectItem(null)} className="flex-1">
@@ -179,6 +213,7 @@ export function HistorySidebar({
               </AlertDialog>
             </SidebarMenuItem>
           ))}
+          
           {items.length === 0 && (
             <div
               className={cn(
@@ -190,6 +225,19 @@ export function HistorySidebar({
               Tu historial aparecerá aquí.
             </div>
           )}
+
+          {items.length > 0 && filteredItems.length === 0 && (
+            <div
+              className={cn(
+                "p-4 text-center text-sm text-muted-foreground",
+                "group-data-[collapsible=icon]:hidden"
+              )}
+            >
+              <Search className="mx-auto h-8 w-8 mb-2" />
+              No se encontraron resultados.
+            </div>
+          )}
+
         </SidebarMenu>
       </SidebarContent>
     </Sidebar>
