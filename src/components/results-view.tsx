@@ -14,7 +14,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -97,7 +96,6 @@ export function ResultsView({ item, onUpdate }: ResultsViewProps) {
               </CardDescription>
             </div>
             <ExportMenu
-              onCopy={() => copyToClipboard(item.type === 'text' ? item.summary : item.description, 'Resultado')}
               onDownloadTxt={() => downloadFile(getDownloadFilename('txt'), item.type === 'text' ? item.summary : item.description)}
               onDownloadMd={() => downloadFile(getDownloadFilename('md'), createMarkdown())}
             />
@@ -112,9 +110,9 @@ export function ResultsView({ item, onUpdate }: ResultsViewProps) {
         <CardContent className="space-y-6">
           <Separator />
           {item.type === "text" ? (
-            <TextView item={item} onUpdate={onUpdate} />
+            <TextView item={item} onUpdate={onUpdate} copyToClipboard={copyToClipboard} />
           ) : (
-            <ImageView item={item} onUpdate={onUpdate} />
+            <ImageView item={item} onUpdate={onUpdate} copyToClipboard={copyToClipboard} />
           )}
         </CardContent>
       </Card>
@@ -122,11 +120,17 @@ export function ResultsView({ item, onUpdate }: ResultsViewProps) {
   );
 }
 
-function TextView({ item, onUpdate }: { item: ProcessedText, onUpdate: (item: ProcessedItem) => void }) {
+function TextView({ item, onUpdate, copyToClipboard }: { item: ProcessedText, onUpdate: (item: ProcessedItem) => void, copyToClipboard: (text: string, type: string) => void }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <h3 className="font-headline text-xl font-semibold mb-2">Texto Original</h3>
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="font-headline text-xl font-semibold">Texto Original</h3>
+          <Button variant="ghost" size="sm" onClick={() => copyToClipboard(item.originalContent, 'Texto original')}>
+            <Copy className="mr-2 h-4 w-4" />
+            Copiar
+          </Button>
+        </div>
         <Card className="bg-muted/30 max-h-96 overflow-y-auto">
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground whitespace-pre-wrap">
@@ -138,7 +142,13 @@ function TextView({ item, onUpdate }: { item: ProcessedText, onUpdate: (item: Pr
       <div>
         <div className="flex justify-between items-center mb-2">
             <h3 className="font-headline text-xl font-semibold">Resumen de IA</h3>
-            <RefineDialog item={item} onUpdate={onUpdate} />
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(item.summary, 'Resumen')}>
+                <Copy className="mr-2 h-4 w-4" />
+                Copiar
+              </Button>
+              <RefineDialog item={item} onUpdate={onUpdate} />
+            </div>
         </div>
         <Card className="bg-background">
             <CardContent className="p-4">
@@ -150,7 +160,7 @@ function TextView({ item, onUpdate }: { item: ProcessedText, onUpdate: (item: Pr
   );
 }
 
-function ImageView({ item, onUpdate }: { item: ProcessedImage, onUpdate: (item: ProcessedItem) => void }) {
+function ImageView({ item, onUpdate, copyToClipboard }: { item: ProcessedImage, onUpdate: (item: ProcessedItem) => void, copyToClipboard: (text: string, type: string) => void }) {
   return (
      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
@@ -169,6 +179,10 @@ function ImageView({ item, onUpdate }: { item: ProcessedImage, onUpdate: (item: 
         <div className="flex justify-between items-center mb-2">
             <h3 className="font-headline text-xl font-semibold">Descripción de IA</h3>
             <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(item.description, 'Descripción')}>
+                <Copy className="mr-2 h-4 w-4" />
+                Copiar
+              </Button>
               <RefineDialog item={item} onUpdate={onUpdate} />
               <GeneratePromptDialog item={item} />
             </div>
@@ -183,7 +197,7 @@ function ImageView({ item, onUpdate }: { item: ProcessedImage, onUpdate: (item: 
   );
 }
 
-function ExportMenu({ onCopy, onDownloadTxt, onDownloadMd }: { onCopy: () => void, onDownloadTxt: () => void, onDownloadMd: () => void}) {
+function ExportMenu({ onDownloadTxt, onDownloadMd }: { onDownloadTxt: () => void, onDownloadMd: () => void}) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -192,9 +206,6 @@ function ExportMenu({ onCopy, onDownloadTxt, onDownloadMd }: { onCopy: () => voi
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onCopy}>
-                    <Copy className="mr-2 h-4 w-4" /> Copiar Resultado
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={onDownloadTxt}>
                     <Download className="mr-2 h-4 w-4" /> Descargar .txt
                 </DropdownMenuItem>
