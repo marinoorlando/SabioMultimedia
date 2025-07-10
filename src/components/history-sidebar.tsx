@@ -258,7 +258,9 @@ function SettingsDialog() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "multimedia-sage-historial.json";
+      const date = new Date();
+      const dateString = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+      a.download = `multimedia-sage-historial-${dateString}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
